@@ -61,7 +61,7 @@ const soldCard = w => `
     </article>`;
 const none = `<div class="empty"><h3>New pieces are on the way</h3><p>Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> for new arrivals, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
 
-// Default: Brand A-Z (then model). Watches without photos always sit at the bottom of whichever sort is chosen.
+// Default: Brand A-Z (then model). Watches without photos sit at the bottom, except in the two newest sorts, which are exact.
 let sortMode = "brand";
 function sortWatches() {
   const has = w => (w.photos && w.photos.length) ? 1 : 0, pr = w => w.price || -1;
@@ -72,7 +72,8 @@ function sortWatches() {
     new: (a, b) => String(b.stock).localeCompare(String(a.stock)),   // stock numbers are assigned in the order added
     year: (a, b) => (Number(b.year) || 0) - (Number(a.year) || 0) || String(b.stock).localeCompare(String(a.stock)),
   }[sortMode];
-  WATCHES.sort((a, b) => has(b) - has(a) || cmp(a, b));
+  const exact = sortMode === "new" || sortMode === "year";
+  WATCHES.sort((a, b) => (exact ? 0 : has(b) - has(a)) || cmp(a, b));
 }
 $("#sort").addEventListener("change", e => { sortMode = e.target.value; sortWatches(); render(); });
 
