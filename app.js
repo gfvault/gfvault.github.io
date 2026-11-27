@@ -59,7 +59,7 @@ const soldCard = w => `
         <span class="price">${w.sold ? "Sold " + esc(new Date(w.sold + "-15T12:00:00").toLocaleDateString(undefined, {month: "long", year: "numeric"})) : "Sold"}</span>
       </div>
     </article>`;
-const none = `<div class="empty"><h3>New pieces are on the way</h3><p>Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> for arrivals, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
+const none = `<div class="empty"><h3>New pieces are on the way</h3><p>Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> for new arrivals, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
 
 // Default: Brand A-Z (then model). Watches without photos always sit at the bottom of whichever sort is chosen.
 let sortMode = "brand";
@@ -80,12 +80,12 @@ function render() {
   $("#grid").innerHTML = list.length ? list.map(card).join("") : none;
   // photographed watches lead the homepage
   const feat = [...WATCHES].sort((a, b) => !!(b.photos || []).length - !!(a.photos || []).length).slice(0, 4);
-  const ask = `<a class="askcard" href="#sell" data-intent="Find a specific watch"><b>Not seeing it?</b><span>Tell us what you want and we'll source it.</span><em>Request a watch &rarr;</em></a>`;
+  const ask = `<a class="askcard" href="#sell" data-intent="Find a specific watch"><b>Not seeing it?</b><span>Tell us what you want and we'll help source it.</span><em>Request a watch &rarr;</em></a>`;
   $("#featured").innerHTML = feat.length ? feat.map(card).join("") + (feat.length < 4 ? ask : "") : none;
 }
 
 function renderSold() {
-  $("#soldgrid").innerHTML = SOLD.length ? SOLD.map(soldCard).join("") : `<p class="empty">Our sold archive is coming soon.</p>`;
+  $("#soldgrid").innerHTML = SOLD.length ? SOLD.map(soldCard).join("") : `<p class="empty">No sold watches to show yet.</p>`;
   $("#homesold").hidden = !SOLD.length;
   $("#homesoldgrid").innerHTML = SOLD.slice(0, 4).map(soldCard).join("");
 }
@@ -100,7 +100,7 @@ function openWatch(w) {
   const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
-  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Sourced and sold by GF Vault and shipped fully insured.`;
+  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Offered by GF Vault and shipped fully insured.`;
   const ask = mailto(`Inquiry: ${title(w)} (${w.stock})`, `Hi GF Vault,\n\nI'm interested in the ${title(w)} (${w.ref || ""}, stock ${w.stock}). Is it still available?\n\nName:\nPhone:\n`);
   $("#modal-body").innerHTML = `<div class="detail"><div class="gallery">${pics}</div><div class="dinfo">
     <span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
@@ -120,7 +120,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").
 $("#sellform").addEventListener("submit", e => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
-  const body = `${f.intent}\n\nName: ${f.name}\nContact: ${f.contact}\nWatch: ${f.brand} ${f.model}\nYear: ${f.year}\nBox & papers: ${f.set}\nAsking: ${f.price}\n\n${f.notes}\n\n(I'll send photos in reply.)`;
+  const body = `${f.intent}\n\nName: ${f.name}\nContact: ${f.contact}\nWatch: ${f.brand} ${f.model}\nYear: ${f.year}\nBox & papers: ${f.set}\nAsking price or budget: ${f.price}\n\n${f.notes}\n\n(Selling or trading? Attach photos if you have them.)`;
   location.href = mailto(`${f.intent}: ${f.brand} ${f.model}`.trim(), body);
 });
 
@@ -150,7 +150,7 @@ function show(watches, updated, sold) {
 }
 const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
   .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
-  .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
+  .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">We couldn't load the inventory. Refresh the page, or DM <a href="${IG}">@gfvault</a> to see what's available.</p>`; $("#soldgrid").innerHTML = `<p class="empty">We couldn't load sold watches. Please refresh the page.</p>`; });
 if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
   .then(d => show(d.watches || [], "live", d.sold)).catch(fallback);
 else fallback();
