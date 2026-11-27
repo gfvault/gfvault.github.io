@@ -4,7 +4,7 @@ const EMAIL = "gfvaultco@gmail.com", IG = "https://instagram.com/gfvault";
 const FEED_URL = "https://script.google.com/macros/s/AKfycbyXfGhkw1ClKhTPCar8ZsOjcPztJA4rVSXvnFUQ8IM5S0x6xQpGHIVui6Ykbf-GOIoa/exec";
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-let WATCHES = [], SOLD = [], brandFilter = "All";
+let WATCHES = [], SOLD = [], brandFilter = "All", query = "";
 
 const VIEWS = ["home", "inventory", "sold", "sell", "about", "contact", "founders"];
 function route() {
@@ -26,7 +26,7 @@ document.addEventListener("click", e => {
   const t = e.target.closest("[data-brand]");
   if (t) {
     const b = t.dataset.brand;
-    if (WATCHES.some(w => w.brand === b)) { brandFilter = b; filters(); render(); location.hash = "inventory"; }
+    if (WATCHES.some(w => w.brand === b)) { brandFilter = b; query = $("#search").value = ""; filters(); render(); location.hash = "inventory"; }
     else { const f = $("#sellform").elements; f.intent.value = "Find a specific watch"; f.brand.value = b; location.hash = "sell"; }
   }
 });
@@ -76,8 +76,13 @@ function sortWatches() {
 $("#sort").addEventListener("change", e => { sortMode = e.target.value; sortWatches(); render(); });
 
 function render() {
-  const list = WATCHES.filter(w => brandFilter === "All" || w.brand === brandFilter);
-  $("#grid").innerHTML = list.length ? list.map(card).join("") : none;
+  // every typed word must appear somewhere; punctuation is ignored so "21030" finds 210.30...
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  const words = norm(query).split(" ").filter(Boolean);
+  const list = WATCHES.filter(w => (brandFilter === "All" || w.brand === brandFilter) &&
+    words.every(t => norm([w.brand, w.model, w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boolean).join(" ")).includes(t)));
+  const noMatch = `<div class="empty"><h3>No matches in stock</h3><p>Try another search, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
+  $("#grid").innerHTML = list.length ? list.map(card).join("") : WATCHES.length ? noMatch : none;
   // photographed watches lead the homepage
   const feat = [...WATCHES].sort((a, b) => !!(b.photos || []).length - !!(a.photos || []).length).slice(0, 4);
   const ask = `<a class="askcard" href="#sell" data-intent="Find a specific watch"><b>Not seeing it?</b><span>Tell us what you want and we'll help source it.</span><em>Request a watch &rarr;</em></a>`;
@@ -94,6 +99,8 @@ function filters() {
   const brands = ["All", ...new Set(WATCHES.map(w => w.brand).filter(Boolean))];
   $("#filters").innerHTML = brands.length > 2 ? brands.map(b => `<button class="${b === brandFilter ? "on" : ""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
 }
+$("#search").addEventListener("input", e => { query = e.target.value; render(); });
+$("#searchform").addEventListener("submit", e => { e.preventDefault(); $("#search").blur(); });
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { brandFilter = b.dataset.b; filters(); render(); } });
 
 function openWatch(w) {
