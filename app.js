@@ -112,7 +112,7 @@ function openWatch(w) {
 }
 ["#grid", "#featured"].forEach(id => {
 $(id).addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openWatch(WATCHES[c.dataset.i]); });
-$("#grid").addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && e.key === "Enter") openWatch(WATCHES[c.dataset.i]); });
+$(id).addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && e.key === "Enter") openWatch(WATCHES[c.dataset.i]); });
 });
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
@@ -149,7 +149,8 @@ function show(watches, updated, sold) {
   filters(); render();
 }
 const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
-  .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
+  .then(d => d.watches && d.watches.length ? d : Promise.reject())
+  .then(d => show(d.watches, d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
   .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">We couldn't load the inventory. Refresh the page, or DM <a href="${IG}">@gfvault</a> to see what's available.</p>`; $("#soldgrid").innerHTML = `<p class="empty">We couldn't load sold watches. Please refresh the page.</p>`; });
 if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
   .then(d => show(d.watches || [], "live", d.sold)).catch(fallback);
