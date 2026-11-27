@@ -103,7 +103,10 @@ function fromSheet(list) {
     photos: String(w.photos || "").split(/\s+/).filter(Boolean)}));
 }
 function show(watches, updated, sold) {
-  WATCHES = watches; SOLD = sold || []; renderSold();
+  // Auto-sort: watches with photos first, priced high to low (unpriced "Inquire" after priced); watches without photos last, same order.
+  const has = w => (w.photos && w.photos.length) ? 1 : 0, pr = w => w.price || -1;
+  WATCHES = [...watches].sort((a, b) => has(b) - has(a) || pr(b) - pr(a) || String(b.stock).localeCompare(String(a.stock)));
+  SOLD = sold || []; renderSold();
   $("#updated").textContent = updated === "live" ? "Live inventory" : updated ? "Inventory updated " + updated : "";
   filters(); render();
 }
