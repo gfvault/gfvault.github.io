@@ -60,6 +60,20 @@ const soldCard = w => `
     </article>`;
 const none = `<div class="empty"><h3>New pieces are on the way</h3><p>Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> for arrivals, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
 
+// Default: Brand A-Z (then model). Watches without photos always sit at the bottom of whichever sort is chosen.
+let sortMode = "brand";
+function sortWatches() {
+  const has = w => (w.photos && w.photos.length) ? 1 : 0, pr = w => w.price || -1;
+  const cmp = {
+    brand: (a, b) => String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model)),
+    high: (a, b) => pr(b) - pr(a) || String(a.brand).localeCompare(String(b.brand)),
+    low: (a, b) => (pr(a) < 0) - (pr(b) < 0) || pr(a) - pr(b) || String(a.brand).localeCompare(String(b.brand)),
+    new: (a, b) => String(b.stock).localeCompare(String(a.stock)),
+  }[sortMode];
+  WATCHES.sort((a, b) => has(b) - has(a) || cmp(a, b));
+}
+$("#sort").addEventListener("change", e => { sortMode = e.target.value; sortWatches(); render(); });
+
 function render() {
   const list = WATCHES.filter(w => brandFilter === "All" || w.brand === brandFilter);
   $("#grid").innerHTML = list.length ? list.map(card).join("") : none;
@@ -128,9 +142,7 @@ function fromSheet(list) {
     photos: String(w.photos || "").split(/\s+/).filter(Boolean)}));
 }
 function show(watches, updated, sold) {
-  // Auto-sort: watches with photos first, priced high to low (unpriced "Inquire" after priced); watches without photos last, same order.
-  const has = w => (w.photos && w.photos.length) ? 1 : 0, pr = w => w.price || -1;
-  WATCHES = [...watches].sort((a, b) => has(b) - has(a) || pr(b) - pr(a) || String(b.stock).localeCompare(String(a.stock)));
+  WATCHES = [...watches]; sortWatches();
   SOLD = sold || []; renderSold();
   $("#updated").textContent = updated === "live" ? "Live inventory" : updated ? "Inventory updated " + updated : "";
   filters(); render();

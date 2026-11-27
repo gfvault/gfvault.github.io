@@ -149,3 +149,5 @@ body{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
 }
 @media (max-width:760px){.top{padding-left:14px;padding-right:14px}}
 @media (max-width:360px){.heroin .btn{padding:12px 8px;font-size:14px;white-space:nowrap}}
+
+.sort{display:flex;align-items:center;gap:8px;font:600 13px Inter,Arial;color:var(--slate)}.sort select{border:1px solid var(--silver);background:#fff;color:var(--gun);padding:7px 10px;border-radius:999px;font:600 13px Inter,Arial}
