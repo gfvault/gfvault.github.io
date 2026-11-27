@@ -4,10 +4,10 @@ const EMAIL = "gfvaultco@gmail.com", IG = "https://instagram.com/gfvault";
 const FEED_URL = "https://script.google.com/macros/s/AKfycbyXfGhkw1ClKhTPCar8ZsOjcPztJA4rVSXvnFUQ8IM5S0x6xQpGHIVui6Ykbf-GOIoa/exec";
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-let WATCHES = [], brandFilter = "All";
+let WATCHES = [], SOLD = [], brandFilter = "All";
 
 function showTab(name) {
-  if (!["inventory", "about", "sell"].includes(name)) name = "inventory";
+  if (!["inventory", "sold", "about", "sell"].includes(name)) name = "inventory";
   document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
   document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.dataset.tab === name));
 }
@@ -37,6 +37,19 @@ function render() {
         <span class="price">${price(w)}<small>Details &rsaquo;</small></span>
       </div>
     </article>`).join("") : `<p class="empty">New pieces are on the way. Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> or tell us what you're looking for.</p>`;
+}
+
+function renderSold() {
+  $("#soldgrid").innerHTML = SOLD.length ? SOLD.map(w => `
+    <article class="card sold">
+      <div class="ph">${photo(w)}<span class="soldtag">Sold</span></div>
+      <div class="info">
+        <span class="brandname">${esc(w.brand)}</span>
+        <span class="model">${esc(w.model)}</span>
+        <span class="specs">${esc(specs(w))}</span>
+        <span class="price">${w.sold ? "Sold " + esc(new Date(w.sold + "-15T12:00:00").toLocaleDateString(undefined, {month: "long", year: "numeric"})) : "Sold"}</span>
+      </div>
+    </article>`).join("") : `<p class="empty">Our sold archive is coming soon.</p>`;
 }
 
 function filters() {
@@ -89,8 +102,8 @@ function fromSheet(list) {
     price: Number(String(w.price).replace(/[^0-9.]/g, "")) || null,
     photos: String(w.photos || "").split(/\s+/).filter(Boolean)}));
 }
-function show(watches, updated) {
-  WATCHES = watches;
+function show(watches, updated, sold) {
+  WATCHES = watches; SOLD = sold || []; renderSold();
   $("#updated").textContent = updated === "live" ? "Live inventory" : updated ? "Inventory updated " + updated : "";
   filters(); render();
 }
@@ -98,6 +111,6 @@ const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r 
   .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
   .catch(() => { $("#grid").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
 if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
-  .then(d => show(d.watches || [], "live")).catch(fallback);
+  .then(d => show(d.watches || [], "live", d.sold)).catch(fallback);
 else fallback();
 showTab(location.hash.slice(1));

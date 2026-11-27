@@ -20,6 +20,7 @@
   <a class="brand" href="#inventory" aria-label="GF Vault home"><img class="dial" src="assets/badge.webp" alt=""><img class="word" src="assets/wordmark.svg" alt="GF Vault"></a>
   <nav>
     <a href="#inventory" data-tab="inventory">Inventory</a>
+    <a href="#sold" data-tab="sold">Sold</a>
     <a href="#about" data-tab="about">About</a>
     <a href="#sell" data-tab="sell">Sell or Trade</a>
   </nav>
@@ -41,6 +42,11 @@
     <p class="note">Don't see what you're after? We source on request. <a href="#sell" data-tab="sell">Tell us what you want</a>.</p>
   </section>
 
+  <section id="tab-sold" class="tab" hidden>
+    <div class="head"><h2>Recently sold</h2></div>
+    <p class="note" style="margin-top:0">A look at pieces that have found new owners through GF Vault. Looking for one like these? <a href="#sell" data-tab="sell">Tell us</a> and we'll source it.</p>
+    <div class="grid" id="soldgrid"><p class="empty">Loading&hellip;</p></div>
+  </section>
   <section id="tab-about" class="tab" hidden>
     <div class="about">
       <img class="badge" src="assets/badge.webp" alt="">

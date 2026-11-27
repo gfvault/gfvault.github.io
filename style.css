@@ -80,3 +80,7 @@ footer p{font-size:13px;margin:6px 0}
 .soon .badge{width:34%!important;height:auto!important;opacity:.18}
 .soon span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);font-weight:600}
 .soon.big{aspect-ratio:1/1}.soon.big .badge{width:40%!important;margin:0!important}
+
+.card.sold{cursor:default}.card.sold .ph{position:relative}.card.sold .ph>img{filter:grayscale(.35)}
+.soldtag{position:absolute;top:10px;left:10px;background:var(--navy,#0A2148);color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+.card.sold .price{color:var(--slate,#667484);font-size:15px}
