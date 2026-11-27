@@ -1,4 +1,4 @@
-// GF Vault site: tabs, inventory from data/inventory.json (built from the sheet by scripts/site_inventory.py), inquiries by email.
+// GF Vault site: hash-routed pages, inventory from data/inventory.json (built from the sheet by scripts/site_inventory.py), inquiries by email.
 const EMAIL = "gfvaultco@gmail.com", IG = "https://instagram.com/gfvault";
 // Live inventory: the dealer portal's public feed (Apps Script web app, ?feed=1). Fallback: data/inventory.json.
 const FEED_URL = "https://script.google.com/macros/s/AKfycbyXfGhkw1ClKhTPCar8ZsOjcPztJA4rVSXvnFUQ8IM5S0x6xQpGHIVui6Ykbf-GOIoa/exec";
@@ -6,15 +6,28 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 let WATCHES = [], SOLD = [], brandFilter = "All";
 
-function showTab(name) {
-  if (!["inventory", "sold", "about", "sell"].includes(name)) name = "inventory";
-  document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
-  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.dataset.tab === name));
+const VIEWS = ["home", "inventory", "sold", "sell", "about", "contact"];
+function route() {
+  let name = location.hash.slice(1);
+  if (!VIEWS.includes(name)) name = "home";
+  document.querySelectorAll(".view").forEach(v => v.hidden = v.dataset.view !== name);
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + name));
+  document.title = (name === "home" ? "" : {inventory: "Inventory", sold: "Sold", sell: "Sell or Trade", about: "About", contact: "Contact"}[name] + " · ") + "GF Vault · Luxury Watch Company";
+  $("#modal").hidden = true; closeMenu(); scrollTo(0, 0);
 }
-window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
+function closeMenu() { $(".top").classList.remove("open"); $(".menu").setAttribute("aria-expanded", "false"); }
+$(".menu").addEventListener("click", () => $(".menu").setAttribute("aria-expanded", $(".top").classList.toggle("open")));
+window.addEventListener("hashchange", route);
 document.addEventListener("click", e => {
-  const a = e.target.closest("[data-tab]");
-  if (a) { e.preventDefault(); history.replaceState(null, "", "#" + a.dataset.tab); showTab(a.dataset.tab); scrollTo({top: 0, behavior: "smooth"}); }
+  const i = e.target.closest("[data-intent]");
+  if (i) $("#sellform").elements.intent.value = i.dataset.intent;
+  if (e.target.closest("nav a")) closeMenu();
+  const t = e.target.closest("[data-brand]");
+  if (t) {
+    const b = t.dataset.brand;
+    if (WATCHES.some(w => w.brand === b)) { brandFilter = b; filters(); render(); location.hash = "inventory"; }
+    else { const f = $("#sellform").elements; f.intent.value = "Find a specific watch"; f.brand.value = b; location.hash = "sell"; }
+  }
 });
 
 const title = w => [w.brand, w.model].filter(Boolean).join(" ");
@@ -25,9 +38,7 @@ const photo = (w, i = 0) => w.photos && w.photos[i]
   : `<div class="soon"><img class="badge" src="assets/badge.webp" alt=""><span>Image coming soon</span></div>`;
 const mailto = (subject, body) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-function render() {
-  const list = WATCHES.filter(w => brandFilter === "All" || w.brand === brandFilter);
-  $("#grid").innerHTML = list.length ? list.map((w, i) => `
+const card = w => `
     <article class="card" data-i="${WATCHES.indexOf(w)}" tabindex="0">
       <div class="ph">${photo(w)}</div>
       <div class="info">
@@ -36,11 +47,8 @@ function render() {
         <span class="specs">${esc(specs(w))}</span>
         <span class="price">${price(w)}<small>Details &rsaquo;</small></span>
       </div>
-    </article>`).join("") : `<p class="empty">New pieces are on the way. Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> or tell us what you're looking for.</p>`;
-}
-
-function renderSold() {
-  $("#soldgrid").innerHTML = SOLD.length ? SOLD.map(w => `
+    </article>`;
+const soldCard = w => `
     <article class="card sold">
       <div class="ph">${photo(w)}<span class="soldtag">Sold</span></div>
       <div class="info">
@@ -49,7 +57,22 @@ function renderSold() {
         <span class="specs">${esc(specs(w))}</span>
         <span class="price">${w.sold ? "Sold " + esc(new Date(w.sold + "-15T12:00:00").toLocaleDateString(undefined, {month: "long", year: "numeric"})) : "Sold"}</span>
       </div>
-    </article>`).join("") : `<p class="empty">Our sold archive is coming soon.</p>`;
+    </article>`;
+const none = `<div class="empty"><h3>New pieces are on the way</h3><p>Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> for arrivals, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
+
+function render() {
+  const list = WATCHES.filter(w => brandFilter === "All" || w.brand === brandFilter);
+  $("#grid").innerHTML = list.length ? list.map(card).join("") : none;
+  // photographed watches lead the homepage
+  const feat = [...WATCHES].sort((a, b) => !!(b.photos || []).length - !!(a.photos || []).length).slice(0, 4);
+  const ask = `<a class="askcard" href="#sell" data-intent="Find a specific watch"><b>Not seeing it?</b><span>Tell us what you want and we'll source it.</span><em>Request a watch &rarr;</em></a>`;
+  $("#featured").innerHTML = feat.length ? feat.map(card).join("") + (feat.length < 4 ? ask : "") : none;
+}
+
+function renderSold() {
+  $("#soldgrid").innerHTML = SOLD.length ? SOLD.map(soldCard).join("") : `<p class="empty">Our sold archive is coming soon.</p>`;
+  $("#homesold").hidden = !SOLD.length;
+  $("#homesoldgrid").innerHTML = SOLD.slice(0, 4).map(soldCard).join("");
 }
 
 function filters() {
@@ -72,8 +95,10 @@ function openWatch(w) {
   </div></div>`;
   $("#modal").hidden = false;
 }
-$("#grid").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openWatch(WATCHES[c.dataset.i]); });
+["#grid", "#featured"].forEach(id => {
+$(id).addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openWatch(WATCHES[c.dataset.i]); });
 $("#grid").addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && e.key === "Enter") openWatch(WATCHES[c.dataset.i]); });
+});
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
 
@@ -112,8 +137,8 @@ function show(watches, updated, sold) {
 }
 const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
   .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
-  .catch(() => { $("#grid").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
+  .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
 if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
   .then(d => show(d.watches || [], "live", d.sold)).catch(fallback);
 else fallback();
-showTab(location.hash.slice(1));
+route();
