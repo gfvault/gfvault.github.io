@@ -75,3 +75,4 @@ footer p{font-size:13px;margin:6px 0}
 }
 @media (max-width:420px){nav a{padding:6px 8px;font-size:12px}.brandname{font-size:10px}.specs{font-size:12px}}
 @media (max-width:340px){.grid{grid-template-columns:1fr}}
+.grid .empty{grid-column:1/-1;text-align:center;padding:40px 0}
