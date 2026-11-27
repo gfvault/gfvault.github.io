@@ -1,7 +1,7 @@
 // GF Vault site: tabs, inventory from data/inventory.json (built from the sheet by scripts/site_inventory.py), inquiries by email.
 const EMAIL = "gfvaultco@gmail.com", IG = "https://instagram.com/gfvault";
-// Live inventory: the sheet's "Website" tab published as CSV (File > Share > Publish to web). Fallback: data/inventory.json.
-const SHEET_CSV = "";
+// Live inventory: the dealer portal's public feed (Apps Script web app, ?feed=1). Fallback: data/inventory.json.
+const FEED_URL = "https://script.google.com/macros/s/AKfycbyXfGhkw1ClKhTPCar8ZsOjcPztJA4rVSXvnFUQ8IM5S0x6xQpGHIVui6Ykbf-GOIoa/exec";
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 let WATCHES = [], brandFilter = "All";
@@ -22,7 +22,7 @@ const specs = w => [w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boo
 const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
 const photo = (w, i = 0) => w.photos && w.photos[i]
   ? `<img src="${esc(w.photos[i])}" alt="${esc(title(w))}" loading="lazy">`
-  : `<img class="badge" src="assets/badge.svg" alt="">`;
+  : `<div class="soon"><img class="badge" src="assets/badge.svg" alt=""><span>Image coming soon</span></div>`;
 const mailto = (subject, body) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
 function render() {
@@ -46,7 +46,7 @@ function filters() {
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { brandFilter = b.dataset.b; filters(); render(); } });
 
 function openWatch(w) {
-  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<img class="badge" src="assets/badge.svg" alt="">`;
+  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.svg" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
   const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Authenticated by GF Vault and shipped fully insured.`;
@@ -97,7 +97,7 @@ function show(watches, updated) {
 const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
   .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
   .catch(() => { $("#grid").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
-if (SHEET_CSV) fetch(SHEET_CSV + (SHEET_CSV.includes("?") ? "&" : "?") + "t=" + Date.now()).then(r => r.ok ? r.text() : Promise.reject())
-  .then(t => show(fromSheet(parseCSV(t)), "live")).catch(fallback);
+if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
+  .then(d => show(d.watches || [], "live")).catch(fallback);
 else fallback();
 showTab(location.hash.slice(1));
