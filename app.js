@@ -69,7 +69,8 @@ function sortWatches() {
     brand: (a, b) => String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model)),
     high: (a, b) => pr(b) - pr(a) || String(a.brand).localeCompare(String(b.brand)),
     low: (a, b) => (pr(a) < 0) - (pr(b) < 0) || pr(a) - pr(b) || String(a.brand).localeCompare(String(b.brand)),
-    new: (a, b) => String(b.stock).localeCompare(String(a.stock)),
+    new: (a, b) => String(b.stock).localeCompare(String(a.stock)),   // stock numbers are assigned in the order added
+    year: (a, b) => (Number(b.year) || 0) - (Number(a.year) || 0) || String(b.stock).localeCompare(String(a.stock)),
   }[sortMode];
   WATCHES.sort((a, b) => has(b) - has(a) || cmp(a, b));
 }
