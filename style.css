@@ -24,7 +24,7 @@ nav a.on{background:var(--navy);color:#fff}
 .dialwrap{justify-self:center;width:min(100%,390px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.16);box-shadow:0 0 0 26px rgba(255,255,255,.035)}
 .dialwrap img{width:88%;filter:drop-shadow(0 22px 34px rgba(0,0,0,.5))}
 .trust{background:var(--ice);border-bottom:1px solid #dde4ec}
-.trustin{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding-top:18px;padding-bottom:18px}
+.trustin{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:18px;padding-bottom:18px}
 .trustin div{display:flex;gap:11px;align-items:center}
 svg[aria-hidden]{width:28px;height:28px;flex:none;fill:none;stroke:var(--navy);stroke-width:1.600;stroke-linecap:round;stroke-linejoin:round}
 .trust span{font-size:12.500px;color:var(--slate);line-height:1.35}.trust b{display:block;color:var(--navy);font-size:14px}
@@ -111,6 +111,7 @@ footer p{font-size:13px;margin:6px 0}
   .menu{display:block}nav{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;flex-direction:column;padding:8px 14px 14px;border-bottom:1px solid #dde4ec;box-shadow:0 16px 30px rgba(10,33,72,.15)}.top.open nav{display:flex}.top.open nav a{font-size:16px;padding:12px 14px}
   .heroin{grid-template-columns:1fr;text-align:center;padding-top:26px;padding-bottom:30px;gap:0}.dialwrap{order:-1;width:176px;margin:12px 0 22px;box-shadow:0 0 0 12px rgba(255,255,255,.04)}.sub{margin:0 auto}.heroin .btns{justify-content:center}.heroin .btn{flex:1}
   .trustin,.tiles,.brands{grid-template-columns:1fr 1fr}.trustin{gap:14px 10px}.trust b{font-size:12.5px}.trust span{font-size:11.5px}
+  .trustin div:last-child{grid-column:1/-1;justify-self:center}
   .tiles{gap:10px;padding-top:18px}.tile{min-height:150px;padding:30px 15px 15px}.tile span{font-size:25px}.tile p{font-size:13px}
   .steps,.cols{grid-template-columns:1fr;gap:10px}.sec,.tiles+.sec{padding:24px 0}.brands button{padding:18px 4px;font-size:12.5px}
   .split{grid-template-columns:1fr;gap:16px}
@@ -144,6 +145,7 @@ body{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
 @media (min-width:761px) and (max-width:1023px){
   #featured,#homesoldgrid{grid-template-columns:1fr 1fr}
   .trustin,.tiles{grid-template-columns:1fr 1fr}.tile{min-height:150px;padding-top:30px}
+  .trustin div:last-child{grid-column:1/-1;justify-self:center}
   .hero h1{font-size:38px}.dialwrap{width:min(100%,290px);box-shadow:0 0 0 16px rgba(255,255,255,.035)}
   .steps{grid-template-columns:1fr}
 }
