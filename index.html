@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=c9ce0cd2">
+<link rel="stylesheet" href="style.css?v=163d60d2">
 </head>
 <body>
 <header class="top">
@@ -53,31 +53,31 @@
   <section class="band"><div class="wrap bandin"><div><h2>Looking for a specific watch?</h2><p>Tell us the model, your budget and your timing. We'll start the search.</p></div><div class="btns"><a class="btn light" href="#sell" data-intent="Find a specific watch">Start a request</a><a class="btn line" href="#contact">Contact us</a></div></div></section>
 </section>
 <section class="view" data-view="inventory" hidden><div class="phead"><div class="wrap"><p class="eyebrow">Buy</p><h1>Inventory</h1><p>Browse our current watches. Don't see what you're after? We can help source it.</p></div></div>
-  <div class="sec"><div class="wrap"><form class="search" id="searchform" role="search"><input type="search" id="search" placeholder="Search model or reference" aria-label="Search inventory" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form><div class="bar"><div class="filters" id="filters"></div><label class="sort">Sort <select id="sort"><option value="brand">Brand A&ndash;Z</option><option value="high">Price: high to low</option><option value="low">Price: low to high</option><option value="new">Recently added</option><option value="year">Watch year: newest first</option></select></label></div><div class="grid" id="grid"><p class="empty">Loading inventory&hellip;</p></div></div></div><section class="band"><div class="wrap bandin"><div><h2>Looking for a specific watch?</h2><p>Tell us the model, your budget and your timing. We'll start the search.</p></div><div class="btns"><a class="btn light" href="#sell" data-intent="Find a specific watch">Start a request</a><a class="btn line" href="#contact">Contact us</a></div></div></section></section>
+  <div class="sec"><div class="wrap"><form class="search" id="searchform" role="search"><input type="search" id="search" placeholder="Model or reference" aria-label="Search inventory" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form><div class="bar"><div class="filters" id="filters"></div><label class="sort">Sort <select id="sort"><option value="brand">Brand A&ndash;Z</option><option value="high">Price: high to low</option><option value="low">Price: low to high</option><option value="new">Recently added</option><option value="year">Watch year: newest first</option></select></label></div><div class="grid" id="grid"><p class="empty">Loading inventory&hellip;</p></div></div></div><section class="band"><div class="wrap bandin"><div><h2>Looking for a specific watch?</h2><p>Tell us the model, your budget and your timing. We'll start the search.</p></div><div class="btns"><a class="btn light" href="#sell" data-intent="Find a specific watch">Start a request</a><a class="btn line" href="#contact">Contact us</a></div></div></section></section>
 <section class="view" data-view="sold" hidden><div class="phead"><div class="wrap"><p class="eyebrow">Archive</p><h1>Recently sold</h1><p>Pieces that have found new owners through GF Vault.</p></div></div>
   <div class="sec"><div class="wrap"><div class="grid" id="soldgrid"><p class="empty">Loading&hellip;</p></div></div></div><section class="band"><div class="wrap bandin"><div><h2>Looking for a specific watch?</h2><p>Tell us the model, your budget and your timing. We'll start the search.</p></div><div class="btns"><a class="btn light" href="#sell" data-intent="Find a specific watch">Start a request</a><a class="btn line" href="#contact">Contact us</a></div></div></section></section>
 <section class="view" data-view="sell" hidden><div class="phead"><div class="wrap"><p class="eyebrow">Sell · Trade · Source</p><h1>Sell, trade or source</h1><p>Tell us about the watch you have or the one you want. We usually reply within a day.</p></div></div>
   <div class="sec"><div class="wrap sell"><div><h2>How selling and trading work</h2><ol class="steps stack"><li><b>1</b><h3>Send the details</h3><p>Brand, reference number, year and what's included.</p></li><li><b>2</b><h3>Get an offer</h3><p>We reply with a cash or trade offer, usually within a day.</p></li><li><b>3</b><h3>Close the deal</h3><p>Once we agree on a price, we arrange payment and shipping or an in-person handoff.</p></li></ol><p class="hint">Selling or trading? Photos help. Email them to gfvaultco@gmail.com or send them by Instagram DM.</p></div>
   <form id="sellform" class="form">
         <div class="row2">
-          <label>Your name<input name="name" required></label>
-          <label>Phone or email<input name="contact" required></label>
+          <label>Your name<input name="name" autocomplete="name" maxlength="200" required></label>
+          <label>Phone or email<input name="contact" maxlength="200" required></label>
         </div>
         <label>I want to
           <select name="intent"><option>Sell my watch</option><option>Trade my watch</option><option>Find a specific watch</option><option>Ask about a watch in stock</option></select>
         </label>
         <div class="row2">
-          <label>Brand<input name="brand" placeholder="e.g. Rolex" required></label>
-          <label>Model / reference<input name="model" placeholder="e.g. Submariner 126610LN"></label>
+          <label>Brand<input name="brand" placeholder="Rolex" maxlength="80" required></label>
+          <label>Model / reference<input name="model" placeholder="Submariner" maxlength="120"></label>
         </div>
         <div class="row3">
-          <label>Year<input name="year" inputmode="numeric" placeholder="2022"></label>
+          <label>Year<input name="year" inputmode="numeric" placeholder="2022" maxlength="20"></label>
           <label>Box &amp; papers
             <select name="set"><option>Full set</option><option>Papers only</option><option>Box only</option><option>Watch only</option></select>
           </label>
-          <label>Asking price or budget<input name="price" inputmode="numeric" placeholder="$"></label>
+          <label>Asking price or budget<input name="price" inputmode="numeric" placeholder="$" maxlength="40"></label>
         </div>
-        <label>Condition and other details<textarea name="notes" rows="3" placeholder="Service history, scratches, timing, links, etc."></textarea></label>
+        <label>Condition and other details<textarea name="notes" rows="3" maxlength="3000" placeholder="Service history, scratches, timing, links, etc."></textarea></label>
         <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <button type="submit">Send inquiry</button>
         <p class="fine" id="formstatus" role="status">Your inquiry goes straight to GF Vault. We'll reply at the phone number or email you give us.</p>
@@ -98,6 +98,6 @@
 </footer>
 
 <div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true"><button class="x" aria-label="Close">&times;</button><div id="modal-body"></div></div></div>
-<script src="app.js?v=6b227759"></script>
+<script src="app.js?v=5b7d1963"></script>
 </body>
 </html>

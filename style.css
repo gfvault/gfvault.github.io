@@ -175,3 +175,6 @@ body{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
 .form .fine.sent{color:#14663a;border:1px solid #14663a}
 .form .fine.failed{color:#9b1c1c;border:1px solid #9b1c1c}
 .form button:disabled{opacity:.6}
+
+/* very small phones: one field per line so hints aren't cut off */
+@media(max-width:360px){.form .row2,.form .row3{grid-template-columns:1fr}.search button{padding:0 14px}.search input{padding:12px 12px}}

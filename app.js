@@ -124,6 +124,10 @@ $(id).addEventListener("keydown", e => { const c = e.target.closest(".card"); if
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
 
+const formNote = $("#formstatus").textContent;
+function resetFormNote() { $("#formstatus").className = "fine"; $("#formstatus").textContent = formNote; }
+$("#sellform").addEventListener("input", resetFormNote);
+
 $("#sellform").addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.target, btn = form.querySelector("button[type=submit]"), status = $("#formstatus");
@@ -148,7 +152,7 @@ $("#modal").addEventListener("click", e => {
   const w = WATCHES[a.dataset.ask], f = $("#sellform").elements;
   f.intent.value = "Ask about a watch in stock"; f.brand.value = w.brand || ""; f.model.value = [w.model, w.ref].filter(Boolean).join(" ");
   f.year.value = w.year || ""; f.set.value = w.set || "Full set"; f.price.value = ""; f.notes.value = `Is this watch still available? (Stock ${w.stock})`;
-  $("#formstatus").className = "fine"; $("#modal").hidden = true;
+  resetFormNote(); $("#modal").hidden = true;
 });
 
 function parseCSV(t) {
