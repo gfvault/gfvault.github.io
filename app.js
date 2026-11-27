@@ -40,7 +40,7 @@ const photo = (w, i = 0) => w.photos && w.photos[i]
 
 const card = w => `
     <article class="card" data-i="${WATCHES.indexOf(w)}" tabindex="0">
-      <div class="ph">${photo(w)}</div>
+      <div class="ph">${photo(w)}${w.coming ? `<span class="soldtag comingtag">Coming soon</span>` : ""}</div>
       <div class="info">
         <span class="brandname">${esc(w.brand)}</span>
         <span class="model">${esc(w.model)}</span>
@@ -85,7 +85,7 @@ function render() {
   const noMatch = `<div class="empty"><h3>No matches in stock</h3><p>Try another search, or tell us what you're looking for.</p><a class="btn navy" href="#sell" data-intent="Find a specific watch">Request a watch</a></div>`;
   $("#grid").innerHTML = list.length ? list.map(card).join("") : WATCHES.length ? noMatch : none;
   // photographed watches lead the homepage
-  const feat = [...WATCHES].sort((a, b) => !!(b.photos || []).length - !!(a.photos || []).length).slice(0, 4);
+  const feat = WATCHES.filter(w => !w.coming).sort((a, b) => !!(b.photos || []).length - !!(a.photos || []).length).slice(0, 4);
   const ask = `<a class="askcard" href="#sell" data-intent="Find a specific watch"><b>Not seeing it?</b><span>Tell us what you want and we'll help source it.</span><em>Request a watch &rarr;</em></a>`;
   $("#featured").innerHTML = feat.length ? feat.map(card).join("") + (feat.length < 4 ? ask : "") : none;
 }
@@ -108,9 +108,9 @@ function openWatch(w) {
   const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
-  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Offered by GF Vault and shipped fully insured.`;
+  const desc = w.coming ? "This watch is on its way to us. Ask about it now and we'll follow up. Condition and what's included will be listed after it arrives and we've checked it." : w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Offered by GF Vault and shipped fully insured.`;
   $("#modal-body").innerHTML = `<div class="detail"><div class="gallery">${pics}</div><div class="dinfo">
-    <span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
+    ${w.coming ? `<span class="comingnote">Coming soon</span>` : ""}<span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
     <div class="price" style="padding:0;font-size:22px">${price(w)}</div>
     <p>${esc(desc)}</p><table>${rows}</table>
     <div class="actions"><a class="cta" href="#sell" data-ask="${WATCHES.indexOf(w)}">Ask about this watch</a><a class="cta ghost" href="${IG}" target="_blank" rel="noopener">DM @gfvault</a><a class="cta ghost" href="tel:+19015505800">Call (901) 550-5800</a></div>
@@ -151,7 +151,7 @@ $("#modal").addEventListener("click", e => {
   if (!a) return;
   const w = WATCHES[a.dataset.ask], f = $("#sellform").elements;
   f.intent.value = "Ask about a watch in stock"; f.brand.value = w.brand || ""; f.model.value = [w.model, w.ref].filter(Boolean).join(" ");
-  f.year.value = w.year || ""; f.set.value = w.set || "Full set"; f.price.value = ""; f.notes.value = `Is this watch still available? (Stock ${w.stock})`;
+  f.year.value = w.year || ""; f.set.value = w.set || "Not sure"; f.price.value = ""; f.notes.value = w.coming ? `I'm interested in this watch when it arrives. (Stock ${w.stock})` : `Is this watch still available? (Stock ${w.stock})`;
   resetFormNote(); $("#modal").hidden = true;
 });
 
