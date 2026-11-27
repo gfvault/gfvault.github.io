@@ -99,7 +99,7 @@ function openWatch(w) {
   const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
-  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Authenticated by GF Vault and shipped fully insured.`;
+  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Sourced and sold by GF Vault and shipped fully insured.`;
   const ask = mailto(`Inquiry: ${title(w)} (${w.stock})`, `Hi GF Vault,\n\nI'm interested in the ${title(w)} (${w.ref || ""}, stock ${w.stock}). Is it still available?\n\nName:\nPhone:\n`);
   $("#modal-body").innerHTML = `<div class="detail"><div class="gallery">${pics}</div><div class="dinfo">
     <span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
