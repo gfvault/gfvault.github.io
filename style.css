@@ -3,7 +3,7 @@
 body{font-family:Inter,Arial,sans-serif;color:var(--gun);background:#fff;-webkit-font-smoothing:antialiased;line-height:1.55}
 a{color:var(--atl)}
 .top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,4vw,48px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--ice)}
-.brand img{height:34px;display:block}
+.brand,.flogo{display:inline-flex;align-items:center;gap:10px}.brand img,.flogo img{display:block}.brand .dial{height:46px;width:46px}.brand .word{height:30px}.flogo .dial{height:54px;width:54px}.flogo .word{height:30px}
 nav{display:flex;gap:4px}
 nav a{padding:8px 14px;border-radius:999px;text-decoration:none;color:var(--slate);font-weight:600;font-size:14px;white-space:nowrap}
 nav a.on{background:var(--navy);color:#fff}
@@ -51,7 +51,7 @@ button[type=submit]:hover,.cta:hover{background:var(--atl)}
 .cta.ghost{background:#fff;color:var(--navy);border:1px solid var(--silver)}
 .fine{font-size:12px;color:var(--slate)}
 footer{background:var(--navy);color:#c9d2dd;text-align:center;padding:36px 16px;margin-top:40px}
-footer img{height:30px;margin-bottom:12px}
+footer .flogo{margin-bottom:12px}
 footer a{color:#fff}
 footer p{font-size:13px;margin:6px 0}
 .modal[hidden],.tab[hidden]{display:none}
@@ -68,7 +68,7 @@ footer p{font-size:13px;margin:6px 0}
 .dinfo td:first-child{color:var(--slate);width:42%}
 .dinfo .actions{display:grid;gap:8px;margin-top:auto}
 @media (max-width:760px){
-  .top{padding:10px 14px}.brand img{height:26px}nav a{padding:7px 10px;font-size:13px}
+  .top{padding:10px 14px}.brand .dial{height:38px;width:38px}.brand .word{height:23px}nav a{padding:7px 10px;font-size:13px}
   .about,.sell,.detail{grid-template-columns:1fr}.about .badge{width:110px}
   .row3{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr 1fr;gap:12px}
   .info{padding:12px}.model{font-size:15px}.price{font-size:15px}
