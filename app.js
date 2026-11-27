@@ -6,13 +6,14 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 let WATCHES = [], SOLD = [], brandFilter = "All";
 
-const VIEWS = ["home", "inventory", "sold", "sell", "about", "contact"];
+const VIEWS = ["home", "inventory", "sold", "sell", "about", "contact", "founders"];
 function route() {
   let name = location.hash.slice(1);
   if (!VIEWS.includes(name)) name = "home";
   document.querySelectorAll(".view").forEach(v => v.hidden = v.dataset.view !== name);
   document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + name));
-  document.title = (name === "home" ? "" : {inventory: "Inventory", sold: "Sold", sell: "Sell or Trade", about: "About", contact: "Contact"}[name] + " · ") + "GF Vault · Luxury Watch Company";
+  document.title = (name === "home" ? "" : {inventory: "Inventory", sold: "Sold", sell: "Sell or Trade", about: "About", contact: "Contact", founders: "Founders"}[name] + " · ") + "GF Vault · Luxury Watch Company";
+  if (name === "founders") { const f = $("#portal"); if (!f.src) f.src = FEED_URL; }
   $("#modal").hidden = true; closeMenu(); scrollTo(0, 0);
 }
 function closeMenu() { $(".top").classList.remove("open"); $(".menu").setAttribute("aria-expanded", "false"); }
