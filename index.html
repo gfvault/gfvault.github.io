@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=0f2d1d7f">
+<link rel="stylesheet" href="style.css?v=c9ce0cd2">
 </head>
 <body>
 <header class="top">
@@ -57,14 +57,14 @@
 <section class="view" data-view="sold" hidden><div class="phead"><div class="wrap"><p class="eyebrow">Archive</p><h1>Recently sold</h1><p>Pieces that have found new owners through GF Vault.</p></div></div>
   <div class="sec"><div class="wrap"><div class="grid" id="soldgrid"><p class="empty">Loading&hellip;</p></div></div></div><section class="band"><div class="wrap bandin"><div><h2>Looking for a specific watch?</h2><p>Tell us the model, your budget and your timing. We'll start the search.</p></div><div class="btns"><a class="btn light" href="#sell" data-intent="Find a specific watch">Start a request</a><a class="btn line" href="#contact">Contact us</a></div></div></section></section>
 <section class="view" data-view="sell" hidden><div class="phead"><div class="wrap"><p class="eyebrow">Sell · Trade · Source</p><h1>Sell, trade or source</h1><p>Tell us about the watch you have or the one you want. We usually reply within a day.</p></div></div>
-  <div class="sec"><div class="wrap sell"><div><h2>How selling and trading work</h2><ol class="steps stack"><li><b>1</b><h3>Send the details</h3><p>Brand, reference number, year and what's included.</p></li><li><b>2</b><h3>Get an offer</h3><p>We reply with a cash or trade offer, usually within a day.</p></li><li><b>3</b><h3>Close the deal</h3><p>Once we agree on a price, we arrange payment and shipping or an in-person handoff.</p></li></ol><p class="hint">Selling or trading? Photos help. Attach them to your email or send them by Instagram DM.</p></div>
+  <div class="sec"><div class="wrap sell"><div><h2>How selling and trading work</h2><ol class="steps stack"><li><b>1</b><h3>Send the details</h3><p>Brand, reference number, year and what's included.</p></li><li><b>2</b><h3>Get an offer</h3><p>We reply with a cash or trade offer, usually within a day.</p></li><li><b>3</b><h3>Close the deal</h3><p>Once we agree on a price, we arrange payment and shipping or an in-person handoff.</p></li></ol><p class="hint">Selling or trading? Photos help. Email them to gfvaultco@gmail.com or send them by Instagram DM.</p></div>
   <form id="sellform" class="form">
         <div class="row2">
           <label>Your name<input name="name" required></label>
           <label>Phone or email<input name="contact" required></label>
         </div>
         <label>I want to
-          <select name="intent"><option>Sell my watch</option><option>Trade my watch</option><option>Find a specific watch</option></select>
+          <select name="intent"><option>Sell my watch</option><option>Trade my watch</option><option>Find a specific watch</option><option>Ask about a watch in stock</option></select>
         </label>
         <div class="row2">
           <label>Brand<input name="brand" placeholder="e.g. Rolex" required></label>
@@ -78,8 +78,9 @@
           <label>Asking price or budget<input name="price" inputmode="numeric" placeholder="$"></label>
         </div>
         <label>Condition and other details<textarea name="notes" rows="3" placeholder="Service history, scratches, timing, links, etc."></textarea></label>
-        <button type="submit">Create email</button>
-        <p class="fine">This opens an email with your details filled in. Your inquiry isn't sent until you send that email.</p>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit">Send inquiry</button>
+        <p class="fine" id="formstatus" role="status">Your inquiry goes straight to GF Vault. We'll reply at the phone number or email you give us.</p>
       </form></div></div></section>
 <section class="view" data-view="about" hidden><div class="phead"><div class="wrap"><p class="eyebrow">About</p><h1>About GF Vault</h1><p>Based in Tennessee, shipping worldwide.</p></div></div>
   <div class="sec"><div class="wrap story"><img src="assets/badge.webp?v=2" alt=""><div><h2>Our story</h2><p>Griffin Fletcher started with numbers. A finance degree from Mississippi State taught him to measure value and risk. Then a watch caught his attention, and he found something numbers alone couldn't explain.</p><p>What pulled him in was the craft behind the dial: tiny mechanical parts working together without a battery, finishing done by hand and generations of watchmakers chasing accuracy. He bought a watch, sold it and discovered how much he enjoyed finding the right piece at the right price. So he kept going. That passion became GF Vault, a watch company in Collierville, Tennessee, where fair pricing comes first.</p></div></div></div></div>
@@ -97,6 +98,6 @@
 </footer>
 
 <div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true"><button class="x" aria-label="Close">&times;</button><div id="modal-body"></div></div></div>
-<script src="app.js?v=e7241635"></script>
+<script src="app.js?v=6b227759"></script>
 </body>
 </html>

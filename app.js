@@ -37,7 +37,6 @@ const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
 const photo = (w, i = 0) => w.photos && w.photos[i]
   ? `<img src="${esc(w.photos[i])}" alt="${esc(title(w))}" loading="lazy">`
   : `<div class="soon"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
-const mailto = (subject, body) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
 const card = w => `
     <article class="card" data-i="${WATCHES.indexOf(w)}" tabindex="0">
@@ -110,12 +109,11 @@ function openWatch(w) {
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
   const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Offered by GF Vault and shipped fully insured.`;
-  const ask = mailto(`Inquiry: ${title(w)} (${w.stock})`, `Hi GF Vault,\n\nI'm interested in the ${title(w)} (${w.ref || ""}, stock ${w.stock}). Is it still available?\n\nName:\nPhone:\n`);
   $("#modal-body").innerHTML = `<div class="detail"><div class="gallery">${pics}</div><div class="dinfo">
     <span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
     <div class="price" style="padding:0;font-size:22px">${price(w)}</div>
     <p>${esc(desc)}</p><table>${rows}</table>
-    <div class="actions"><a class="cta" href="${ask}">Email about this watch</a><a class="cta ghost" href="${IG}" target="_blank" rel="noopener">DM @gfvault</a><a class="cta ghost" href="tel:+19015505800">Call (901) 550-5800</a></div>
+    <div class="actions"><a class="cta" href="#sell" data-ask="${WATCHES.indexOf(w)}">Ask about this watch</a><a class="cta ghost" href="${IG}" target="_blank" rel="noopener">DM @gfvault</a><a class="cta ghost" href="tel:+19015505800">Call (901) 550-5800</a></div>
   </div></div>`;
   $("#modal").hidden = false;
 }
@@ -126,11 +124,31 @@ $(id).addEventListener("keydown", e => { const c = e.target.closest(".card"); if
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
 
-$("#sellform").addEventListener("submit", e => {
+$("#sellform").addEventListener("submit", async e => {
   e.preventDefault();
-  const f = Object.fromEntries(new FormData(e.target));
-  const body = `${f.intent}\n\nName: ${f.name}\nContact: ${f.contact}\nWatch: ${f.brand} ${f.model}\nYear: ${f.year}\nBox & papers: ${f.set}\nAsking price or budget: ${f.price}\n\n${f.notes}\n\n(Selling or trading? Attach photos if you have them.)`;
-  location.href = mailto(`${f.intent}: ${f.brand} ${f.model}`.trim(), body);
+  const form = e.target, btn = form.querySelector("button[type=submit]"), status = $("#formstatus");
+  btn.disabled = true; btn.textContent = "Sending\u2026"; status.className = "fine";
+  try {
+    // a plain-text body keeps this a "simple" request, which Apps Script accepts from another site
+    const r = await fetch(FEED_URL, {method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(form))), signal: AbortSignal.timeout(20000)});
+    if (!(await r.json()).ok) throw new Error("not sent");
+    form.reset(); status.className = "fine sent";
+    status.textContent = "Sent. Thanks \u2014 we'll be in touch soon.";
+  } catch {
+    status.className = "fine failed";
+    status.textContent = "We couldn't confirm your inquiry was sent. Please call or text (901) 550-5800, or email gfvaultco@gmail.com.";
+  }
+  btn.disabled = false; btn.textContent = "Send inquiry";
+});
+
+// "Ask about this watch" opens the form already filled in
+$("#modal").addEventListener("click", e => {
+  const a = e.target.closest("[data-ask]");
+  if (!a) return;
+  const w = WATCHES[a.dataset.ask], f = $("#sellform").elements;
+  f.intent.value = "Ask about a watch in stock"; f.brand.value = w.brand || ""; f.model.value = [w.model, w.ref].filter(Boolean).join(" ");
+  f.year.value = w.year || ""; f.set.value = w.set || "Full set"; f.price.value = ""; f.notes.value = `Is this watch still available? (Stock ${w.stock})`;
+  $("#formstatus").className = "fine"; $("#modal").hidden = true;
 });
 
 function parseCSV(t) {

@@ -168,3 +168,10 @@ body{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
 .search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 16px;border:1px solid #cfd8e3;border-radius:999px;background:#fff;color:var(--navy)}
 .search input:focus{outline:2px solid var(--navy);outline-offset:1px;border-color:transparent}
 .search button{font:inherit;font-weight:700;font-size:14px;padding:0 22px;border:0;border-radius:999px;background:var(--navy);color:#fff;cursor:pointer}
+
+/* inquiry form status; .hp is the hidden anti-spam field */
+.form .hp{position:absolute;left:-9999px;width:1px;height:1px}
+.form .fine.sent,.form .fine.failed{font-size:15px;font-weight:600;padding:12px 14px;border-radius:9px;background:#fff}
+.form .fine.sent{color:#14663a;border:1px solid #14663a}
+.form .fine.failed{color:#9b1c1c;border:1px solid #9b1c1c}
+.form button:disabled{opacity:.6}
