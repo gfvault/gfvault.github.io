@@ -36,7 +36,7 @@ const specs = w => [w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boo
 const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
 const photo = (w, i = 0) => w.photos && w.photos[i]
   ? `<img src="${esc(w.photos[i])}" alt="${esc(title(w))}" loading="lazy">`
-  : `<div class="soon"><img class="badge" src="assets/badge.webp" alt=""><span>Image coming soon</span></div>`;
+  : `<div class="soon"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
 const mailto = (subject, body) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
 const card = w => `
@@ -97,7 +97,7 @@ function filters() {
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { brandFilter = b.dataset.b; filters(); render(); } });
 
 function openWatch(w) {
-  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp" alt=""><span>Image coming soon</span></div>`;
+  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
   const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Sourced and sold by GF Vault and shipped fully insured.`;
