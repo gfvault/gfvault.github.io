@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GF Vault · Luxury Watch Company</title>
+<meta name="description" content="GF Vault buys, sells, trades and sources luxury watches. Tennessee based, worldwide shipping.">
+<meta property="og:title" content="GF Vault · Luxury Watch Company">
+<meta property="og:description" content="Buy · Sell · Trade · Source. Tennessee based, worldwide shipping.">
+<meta property="og:image" content="assets/badge.svg">
+<link rel="icon" href="assets/badge.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#inventory" aria-label="GF Vault home"><img src="assets/logo.svg" alt="GF Vault"></a>
+  <nav>
+    <a href="#inventory" data-tab="inventory">Inventory</a>
+    <a href="#about" data-tab="about">About</a>
+    <a href="#sell" data-tab="sell">Sell or Trade</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <p class="eyebrow">Luxury Watch Company</p>
+  <h1>Buy &middot; Sell &middot; Trade &middot; Source</h1>
+  <p class="sub">Authenticated pre-owned timepieces. Tennessee based, shipping worldwide.</p>
+</section>
+
+<main>
+  <section id="tab-inventory" class="tab">
+    <div class="bar">
+      <h2>Available now</h2>
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="grid" id="grid"><p class="empty">Loading inventory&hellip;</p></div>
+    <p class="note">Don't see what you're after? We source on request. <a href="#sell" data-tab="sell">Tell us what you want</a>.</p>
+  </section>
+
+  <section id="tab-about" class="tab" hidden>
+    <div class="about">
+      <img class="badge" src="assets/badge.svg" alt="">
+      <div>
+        <h2>About GF Vault</h2>
+        <p>GF Vault is a Tennessee-based luxury watch company that buys, sells, trades and sources fine timepieces from Rolex, Tudor, Omega, Cartier, Grand Seiko, IWC and other leading houses.</p>
+        <p>Every watch is checked for authenticity before it is listed. We describe condition honestly, photograph what you are buying, and ship fully insured.</p>
+        <ul class="points">
+          <li><strong>Authenticity first.</strong> Long experience in authentication and counterfeit detection.</li>
+          <li><strong>Fair, fast deals.</strong> Straightforward pricing and quick payment when we buy.</li>
+          <li><strong>Worldwide shipping.</strong> Fully insured, tracked delivery.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-sell" class="tab" hidden>
+    <div class="sell">
+      <div>
+        <h2>Sell or trade your watch</h2>
+        <p>Tell us about it and we'll come back with a fair cash or trade offer, usually within a day. Photos help: send them by email or Instagram DM after you submit.</p>
+        <p class="contact-lines">
+          <a href="mailto:gfvaultco@gmail.com">gfvaultco@gmail.com</a><br>
+          <a href="tel:+19015505800">(901) 550-5800</a><br>
+          <a href="https://instagram.com/gfvault" target="_blank" rel="noopener">@gfvault on Instagram</a>
+        </p>
+      </div>
+      <form id="sellform" class="form">
+        <div class="row2">
+          <label>Your name<input name="name" required></label>
+          <label>Phone or email<input name="contact" required></label>
+        </div>
+        <label>I want to
+          <select name="intent"><option>Sell my watch</option><option>Trade my watch</option><option>Find a specific watch</option></select>
+        </label>
+        <div class="row2">
+          <label>Brand<input name="brand" placeholder="e.g. Rolex" required></label>
+          <label>Model / reference<input name="model" placeholder="e.g. Submariner 126610LN"></label>
+        </div>
+        <div class="row3">
+          <label>Year<input name="year" inputmode="numeric" placeholder="2022"></label>
+          <label>Box &amp; papers
+            <select name="set"><option>Full set</option><option>Papers only</option><option>Box only</option><option>Watch only</option></select>
+          </label>
+          <label>Asking price<input name="price" inputmode="numeric" placeholder="$"></label>
+        </div>
+        <label>Condition and anything else<textarea name="notes" rows="3" placeholder="Service history, scratches, links, etc."></textarea></label>
+        <button type="submit">Send inquiry</button>
+        <p class="fine">This opens an email to GF Vault with your details filled in.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <img src="assets/logo-dark.svg" alt="GF Vault">
+  <p>GF Vault Co. &middot; Collierville, Tennessee &middot; <a href="tel:+19015505800">(901) 550-5800</a> &middot; <a href="mailto:gfvaultco@gmail.com">gfvaultco@gmail.com</a> &middot; <a href="https://instagram.com/gfvault" target="_blank" rel="noopener">@gfvault</a></p>
+  <p class="fine" id="updated"></p>
+</footer>
+
+<div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true"><button class="x" aria-label="Close">&times;</button><div id="modal-body"></div></div></div>
+<script src="app.js"></script>
+</body>
+</html>

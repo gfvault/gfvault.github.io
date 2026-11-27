@@ -1,0 +1,103 @@
+// GF Vault site: tabs, inventory from data/inventory.json (built from the sheet by scripts/site_inventory.py), inquiries by email.
+const EMAIL = "gfvaultco@gmail.com", IG = "https://instagram.com/gfvault";
+// Live inventory: the sheet's "Website" tab published as CSV (File > Share > Publish to web). Fallback: data/inventory.json.
+const SHEET_CSV = "";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+let WATCHES = [], brandFilter = "All";
+
+function showTab(name) {
+  if (!["inventory", "about", "sell"].includes(name)) name = "inventory";
+  document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.dataset.tab === name));
+}
+window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-tab]");
+  if (a) { e.preventDefault(); history.replaceState(null, "", "#" + a.dataset.tab); showTab(a.dataset.tab); scrollTo({top: 0, behavior: "smooth"}); }
+});
+
+const title = w => [w.brand, w.model].filter(Boolean).join(" ");
+const specs = w => [w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boolean).join(" · ");
+const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
+const photo = (w, i = 0) => w.photos && w.photos[i]
+  ? `<img src="${esc(w.photos[i])}" alt="${esc(title(w))}" loading="lazy">`
+  : `<img class="badge" src="assets/badge.svg" alt="">`;
+const mailto = (subject, body) => `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+function render() {
+  const list = WATCHES.filter(w => brandFilter === "All" || w.brand === brandFilter);
+  $("#grid").innerHTML = list.length ? list.map((w, i) => `
+    <article class="card" data-i="${WATCHES.indexOf(w)}" tabindex="0">
+      <div class="ph">${photo(w)}</div>
+      <div class="info">
+        <span class="brandname">${esc(w.brand)}</span>
+        <span class="model">${esc(w.model)}</span>
+        <span class="specs">${esc(specs(w))}</span>
+        <span class="price">${price(w)}<small>Details &rsaquo;</small></span>
+      </div>
+    </article>`).join("") : `<p class="empty">New pieces are on the way. Follow <a href="${IG}" target="_blank" rel="noopener">@gfvault</a> or tell us what you're looking for.</p>`;
+}
+
+function filters() {
+  const brands = ["All", ...new Set(WATCHES.map(w => w.brand).filter(Boolean))];
+  $("#filters").innerHTML = brands.length > 2 ? brands.map(b => `<button class="${b === brandFilter ? "on" : ""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
+}
+$("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { brandFilter = b.dataset.b; filters(); render(); } });
+
+function openWatch(w) {
+  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<img class="badge" src="assets/badge.svg" alt="">`;
+  const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
+    .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
+  const desc = w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Authenticated by GF Vault and shipped fully insured.`;
+  const ask = mailto(`Inquiry: ${title(w)} (${w.stock})`, `Hi GF Vault,\n\nI'm interested in the ${title(w)} (${w.ref || ""}, stock ${w.stock}). Is it still available?\n\nName:\nPhone:\n`);
+  $("#modal-body").innerHTML = `<div class="detail"><div class="gallery">${pics}</div><div class="dinfo">
+    <span class="brandname">${esc(w.brand)}</span><h2>${esc(w.model)}</h2>
+    <div class="price" style="padding:0;font-size:22px">${price(w)}</div>
+    <p>${esc(desc)}</p><table>${rows}</table>
+    <div class="actions"><a class="cta" href="${ask}">Email about this watch</a><a class="cta ghost" href="${IG}" target="_blank" rel="noopener">DM @gfvault</a><a class="cta ghost" href="tel:+19015505800">Call (901) 550-5800</a></div>
+  </div></div>`;
+  $("#modal").hidden = false;
+}
+$("#grid").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openWatch(WATCHES[c.dataset.i]); });
+$("#grid").addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && e.key === "Enter") openWatch(WATCHES[c.dataset.i]); });
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
+
+$("#sellform").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const body = `${f.intent}\n\nName: ${f.name}\nContact: ${f.contact}\nWatch: ${f.brand} ${f.model}\nYear: ${f.year}\nBox & papers: ${f.set}\nAsking: ${f.price}\n\n${f.notes}\n\n(I'll send photos in reply.)`;
+  location.href = mailto(`${f.intent}: ${f.brand} ${f.model}`.trim(), body);
+});
+
+function parseCSV(t) {
+  const rows = []; let row = [], f = "", q = false;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (q) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true; else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && t[i + 1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; }
+    else f += c;
+  }
+  if (f || row.length) { row.push(f); rows.push(row); }
+  const head = rows.shift() || [];
+  return rows.filter(r => r[0]).map(r => Object.fromEntries(head.map((h, i) => [h, r[i] || ""])));
+}
+function fromSheet(list) {
+  return list.map(w => ({...w, year: w.year ? Number(w.year) : null,
+    price: Number(String(w.price).replace(/[^0-9.]/g, "")) || null,
+    photos: String(w.photos || "").split(/\s+/).filter(Boolean)}));
+}
+function show(watches, updated) {
+  WATCHES = watches;
+  $("#updated").textContent = updated === "live" ? "Live inventory" : updated ? "Inventory updated " + updated : "";
+  filters(); render();
+}
+const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
+  .then(d => show(d.watches || [], d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
+  .catch(() => { $("#grid").innerHTML = `<p class="empty">Inventory is loading slowly. DM <a href="${IG}">@gfvault</a> for what's available.</p>`; });
+if (SHEET_CSV) fetch(SHEET_CSV + (SHEET_CSV.includes("?") ? "&" : "?") + "t=" + Date.now()).then(r => r.ok ? r.text() : Promise.reject())
+  .then(t => show(fromSheet(parseCSV(t)), "live")).catch(fallback);
+else fallback();
+showTab(location.hash.slice(1));
