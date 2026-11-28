@@ -188,7 +188,8 @@ const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r 
   .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">We couldn't load the inventory. Refresh the page, or DM <a href="${IG}">@gfvault</a> to see what's available.</p>`; $("#soldgrid").innerHTML = `<p class="empty">We couldn't load sold watches. Please refresh the page.</p>`; });
 const CK = "gfv_feed";
 let cached = null; try { cached = localStorage.getItem(CK); if (cached) { const c = JSON.parse(cached); show(c.watches || [], "live", c.sold); } } catch (x) { cached = null; }
-if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
+const direct = () => fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject());
+if (FEED_URL) fetch("/feed").then(r => r.ok ? r.json() : Promise.reject()).then(d => Array.isArray(d.watches) ? d : Promise.reject()).catch(direct)
   .then(d => { const j = JSON.stringify({watches: d.watches || [], sold: d.sold || []}); try { localStorage.setItem(CK, j); } catch (x) {} if (j !== cached) show(d.watches || [], "live", d.sold); })
   .catch(() => { if (!cached) fallback(); });
 else fallback();
