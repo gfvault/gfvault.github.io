@@ -34,8 +34,9 @@ document.addEventListener("click", e => {
 const title = w => [w.brand, w.model].filter(Boolean).join(" ");
 const specs = w => [w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boolean).join(" · ");
 const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
+const thumb = (u, n) => String(u).replace(/=w\d+$/, "=w" + n);
 const photo = (w, i = 0) => w.photos && w.photos[i]
-  ? `<img src="${esc(w.photos[i])}" alt="${esc(title(w))}" loading="lazy">`
+  ? `<img src="${esc(thumb(w.photos[i], 800))}" alt="${esc(title(w))}" loading="lazy">`
   : `<div class="soon"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
 
 const card = w => `
