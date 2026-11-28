@@ -169,7 +169,7 @@ function parseCSV(t) {
   return rows.filter(r => r[0]).map(r => Object.fromEntries(head.map((h, i) => [h, r[i] || ""])));
 }
 function fromSheet(list) {
-  return list.map(w => ({...w, year: w.year ? Number(w.year) : null,
+  return list.map(w => ({...w, year: w.year ? (Number(w.year) || String(w.year)) : null,
     price: Number(String(w.price).replace(/[^0-9.]/g, "")) || null,
     photos: String(w.photos || "").split(/\s+/).filter(Boolean)}));
 }
