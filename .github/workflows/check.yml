@@ -1,0 +1,14 @@
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20}
+      - run: node --check app.js
+      - run: node tests/feed.test.mjs
+      - name: index.html references versioned files that exist
+        run: |
+          for f in $(grep -o -E '(style\.css|app\.js)\?v=[a-f0-9]+' index.html | cut -d'?' -f1); do test -f "$f" || exit 1; done

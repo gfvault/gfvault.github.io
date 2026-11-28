@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {onRequestGet} from '../functions/feed.js';
+const store = new Map();
+globalThis.caches = {default: {match: async k => store.get(k.url)?.clone(), put: async (k, r) => { store.set(k.url, r); }}};
+const ctx = {request: new Request('https://gfvaultco.com/feed'), waitUntil: p => p};
+let mode = 'ok';
+globalThis.fetch = async () => mode === 'ok' ? new Response(JSON.stringify({watches: [{stock: 'A'}], sold: []}), {status: 200}) : mode === 'down' ? new Response('x', {status: 500}) : new Response('<html>', {status: 200});
+let r = await onRequestGet(ctx); assert.equal(r.status,200);console.log('ok', r.status, r.headers.get('cache-control'), (await r.json()).watches.length);
+mode = 'down'; r = await onRequestGet(ctx); assert.equal(r.headers.get('x-feed'),'stale');console.log('down->stale', r.status, r.headers.get('x-feed'), (await r.json()).watches.length);
+mode = 'junk'; r = await onRequestGet(ctx); console.log('junk->stale', r.status, r.headers.get('x-feed'));
+store.clear(); mode = 'down'; r = await onRequestGet(ctx); assert.equal(r.status,502);console.log('down no cache', r.status);

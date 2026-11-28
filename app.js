@@ -182,15 +182,23 @@ function show(watches, updated, sold) {
   $("#updated").textContent = updated === "live" ? "Live inventory" : updated ? "Inventory updated " + updated : "";
   filters(); render();
 }
-const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r => r.json())
+const fallback = () => fetch("data/inventory.json", {cache: "no-store", ...tmo(10000)}).then(r => r.json())
   .then(d => d.watches && d.watches.length ? d : Promise.reject())
   .then(d => show(d.watches, d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
   .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">We couldn't load the inventory. Refresh the page, or DM <a href="${IG}">@gfvault</a> to see what's available.</p>`; $("#soldgrid").innerHTML = `<p class="empty">We couldn't load sold watches. Please refresh the page.</p>`; });
 const CK = "gfv_feed";
 let cached = null; try { cached = localStorage.getItem(CK); if (cached) { const c = JSON.parse(cached); show(c.watches || [], "live", c.sold); } } catch (x) { cached = null; }
-const direct = () => fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject());
-if (FEED_URL) fetch("/feed").then(r => r.ok ? r.json() : Promise.reject()).then(d => Array.isArray(d.watches) ? d : Promise.reject()).catch(direct)
+const tmo = ms => typeof AbortSignal !== "undefined" && AbortSignal.timeout ? {signal: AbortSignal.timeout(ms)} : {};
+const direct = () => fetch(FEED_URL + "?feed=1&t=" + Date.now(), tmo(12000)).then(r => r.ok ? r.json() : Promise.reject());
+if (FEED_URL) fetch("/feed", tmo(7000)).then(r => r.ok ? r.json() : Promise.reject()).then(d => Array.isArray(d.watches) ? d : Promise.reject()).catch(direct)
   .then(d => { const j = JSON.stringify({watches: d.watches || [], sold: d.sold || []}); try { localStorage.setItem(CK, j); } catch (x) {} if (j !== cached) show(d.watches || [], "live", d.sold); })
   .catch(() => { if (!cached) fallback(); });
 else fallback();
 route();
+
+// If a watch photo fails to load, swap in the "Image coming soon" badge instead of a broken-image icon.
+document.addEventListener("error", e => {
+  const i = e.target;
+  if (!i || i.tagName !== "IMG" || i.dataset.failed || !i.closest(".ph, .gallery") || i.classList.contains("badge")) return;
+  i.dataset.failed = "1"; i.removeAttribute("data-full"); i.className = "badge"; i.src = "assets/badge.webp?v=2"; i.style.cursor = "default";
+}, true);
