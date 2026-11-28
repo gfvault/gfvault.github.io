@@ -71,7 +71,7 @@
           <label>Model / reference<input name="model" placeholder="Submariner" maxlength="120"></label>
         </div>
         <div class="row3">
-          <label>Year<input name="year" inputmode="numeric" placeholder="2022" maxlength="20"></label>
+          <label>Year<input name="year" list="yearopts" placeholder="2022, Unknown or Open card" maxlength="20" autocomplete="off"><datalist id="yearopts"><option value="Unknown"><option value="Open card"></datalist></label>
           <label>Box &amp; papers
             <select name="set"><option>Full set</option><option>Papers only</option><option>Box only</option><option>Watch only</option><option>Not sure</option></select>
           </label>
