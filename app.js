@@ -7,6 +7,8 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 let WATCHES = [], SOLD = [], brandFilter = "All", query = "";
 
 const VIEWS = ["home", "inventory", "sold", "sell", "about", "contact", "founders"];
+const setModal = open => { $("#modal").hidden = !open; document.body.classList.toggle("lock", open); if (!open) document.querySelectorAll(".lightbox").forEach(l => l.remove()); };
+function zoom(src) { const d = document.createElement("div"); d.className = "lightbox"; d.innerHTML = `<img src="${esc(src)}" alt="">`; d.onclick = () => d.remove(); document.body.appendChild(d); }
 function route() {
   let name = location.hash.slice(1);
   if (!VIEWS.includes(name)) name = "home";
@@ -14,7 +16,7 @@ function route() {
   document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + name));
   document.title = (name === "home" ? "" : {inventory: "Inventory", sold: "Sold", sell: "Sell or Trade", about: "About", contact: "Contact", founders: "Founders"}[name] + " · ") + "GF Vault · Luxury Watch Company";
   if (name === "founders") { const f = $("#portal"); if (!f.src) f.src = FEED_URL; }
-  $("#modal").hidden = true; closeMenu(); scrollTo(0, 0);
+  setModal(false); closeMenu(); scrollTo(0, 0);
 }
 function closeMenu() { $(".top").classList.remove("open"); $(".menu").setAttribute("aria-expanded", "false"); }
 $(".menu").addEventListener("click", () => $(".menu").setAttribute("aria-expanded", $(".top").classList.toggle("open")));
@@ -36,7 +38,7 @@ const specs = w => [w.ref, w.year, w.dial && w.dial + " dial", w.set].filter(Boo
 const price = w => w.price ? "$" + Number(w.price).toLocaleString() : "Inquire";
 const thumb = (u, n) => String(u).replace(/=w\d+$/, "=w" + n);
 const photo = (w, i = 0) => w.photos && w.photos[i]
-  ? `<img src="${esc(thumb(w.photos[i], 800))}" alt="${esc(title(w))}" loading="lazy">`
+  ? `<img src="${esc(thumb(w.photos[i], 800))}" alt="${esc(title(w))}" loading="lazy" decoding="async">`
   : `<div class="soon"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
 
 const card = w => `
@@ -106,7 +108,7 @@ $("#searchform").addEventListener("submit", e => { e.preventDefault(); $("#searc
 $("#filters").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { brandFilter = b.dataset.b; filters(); render(); } });
 
 function openWatch(w) {
-  const pics = w.photos && w.photos.length ? w.photos.map(p => `<img src="${esc(p)}" alt="${esc(title(w))}">`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
+  const pics = w.photos && w.photos.length ? w.photos.map((p, k) => `<img src="${esc(thumb(p, 1400))}" data-full="${esc(thumb(p, 2400))}" alt="${esc(title(w))}" decoding="async"${k ? ' loading="lazy"' : ""}>`).join("") : `<div class="soon big"><img class="badge" src="assets/badge.webp?v=2" alt=""><span>Image coming soon</span></div>`;
   const rows = [["Reference", w.ref], ["Year", w.year], ["Dial", w.dial], ["Condition", w.condition], ["Box & papers", w.set], ["Stock #", w.stock]]
     .filter(r => r[1]).map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join("");
   const desc = w.coming ? "This watch is on its way to us. Ask about it now and we'll follow up. Condition and what's included will be listed after it arrives and we've checked it." : w.description || `${title(w)}${w.year ? ", " + w.year : ""}${w.set ? ", " + w.set.toLowerCase() : ""}. Offered by GF Vault and shipped fully insured.`;
@@ -116,14 +118,14 @@ function openWatch(w) {
     <p>${esc(desc)}</p><table>${rows}</table>
     <div class="actions"><a class="cta" href="#sell" data-ask="${WATCHES.indexOf(w)}">Ask about this watch</a><a class="cta ghost" href="${IG}" target="_blank" rel="noopener">DM @gfvault</a><a class="cta ghost" href="tel:+19015505800">Call (901) 550-5800</a></div>
   </div></div>`;
-  $("#modal").hidden = false;
+  setModal(true);
 }
 ["#grid", "#featured"].forEach(id => {
 $(id).addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openWatch(WATCHES[c.dataset.i]); });
 $(id).addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && e.key === "Enter") openWatch(WATCHES[c.dataset.i]); });
 });
-$("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.closest(".x")) $("#modal").hidden = true; });
-document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
+$("#modal").addEventListener("click", e => { const g = e.target.closest(".gallery img[data-full]"); if (g) return zoom(g.dataset.full); if (e.target.id === "modal" || e.target.closest(".x")) setModal(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { const l = document.querySelector(".lightbox"); l ? l.remove() : setModal(false); } });
 
 const formNote = $("#formstatus").textContent;
 function resetFormNote() { $("#formstatus").className = "fine"; $("#formstatus").textContent = formNote; }
@@ -184,7 +186,10 @@ const fallback = () => fetch("data/inventory.json", {cache: "no-store"}).then(r 
   .then(d => d.watches && d.watches.length ? d : Promise.reject())
   .then(d => show(d.watches, d.updated ? new Date(d.updated + "T12:00:00").toLocaleDateString(undefined, {month: "long", day: "numeric", year: "numeric"}) : ""))
   .catch(() => { $("#grid").innerHTML = $("#featured").innerHTML = `<p class="empty">We couldn't load the inventory. Refresh the page, or DM <a href="${IG}">@gfvault</a> to see what's available.</p>`; $("#soldgrid").innerHTML = `<p class="empty">We couldn't load sold watches. Please refresh the page.</p>`; });
+const CK = "gfv_feed";
+let cached = null; try { cached = localStorage.getItem(CK); if (cached) { const c = JSON.parse(cached); show(c.watches || [], "live", c.sold); } } catch (x) { cached = null; }
 if (FEED_URL) fetch(FEED_URL + "?feed=1&t=" + Date.now()).then(r => r.ok ? r.json() : Promise.reject())
-  .then(d => show(d.watches || [], "live", d.sold)).catch(fallback);
+  .then(d => { const j = JSON.stringify({watches: d.watches || [], sold: d.sold || []}); try { localStorage.setItem(CK, j); } catch (x) {} if (j !== cached) show(d.watches || [], "live", d.sold); })
+  .catch(() => { if (!cached) fallback(); });
 else fallback();
 route();
